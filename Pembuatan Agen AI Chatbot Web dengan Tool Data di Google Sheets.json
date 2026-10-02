@@ -1,0 +1,157 @@
+{
+  "name": "Pembuatan Agen AI Chatbot Web dengan Tool Data di Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! 👋 Aku Utiee si Makeup Assistant.\n\nAku bisa bantu kamu mencari produk makeup berdasarkan jenis, harga, finish, shade/variasi, dan kegunaannya.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b3c51c3e-afe8-47dd-a692-879464e6f7da",
+      "name": "When chat message received",
+      "webhookId": "fd9c19db-373e-4851-9c4a-d9749d8eb465"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah Makeup Assistant yang membantu pengguna mencari dan memilih produk makeup.\n\nTugas kamu adalah memberikan informasi dan rekomendasi produk makeup berdasarkan data yang tersedia pada Google Sheets.\n\nGunakan Google Sheets Tool untuk mengambil informasi mengenai nama produk, jenis makeup, harga, shade atau variasi, finish, dan kegunaan produk.\n\nAturan:\n- Gunakan Google Sheets Tool ketika pengguna menanyakan produk, harga, jenis, atau informasi produk makeup.\n- Jangan mengarang harga, shade, finish, atau informasi produk yang tidak tersedia di Google Sheets.\n- Jika produk ditemukan, berikan informasi sesuai dengan data yang tersedia.\n- Jika produk tidak ditemukan, katakan bahwa produk tersebut tidak tersedia dalam data.\n- Jika pengguna meminta rekomendasi, gunakan data dari Google Sheets sebagai dasar rekomendasi.\n- Perhatikan budget dan kebutuhan pengguna jika diberikan.\n- Jika pengguna meminta beberapa pilihan, berikan maksimal 3 rekomendasi.\n- Gunakan bahasa Indonesia yang santai, ramah, dan mudah dipahami.\n- Jawab secara singkat dan jelas.\n- Ingat konteks percakapan sebelumnya jika masih berkaitan.\n- Jika pertanyaan tidak berkaitan dengan makeup, jelaskan bahwa kamu fokus membantu informasi dan rekomendasi produk makeup.\n\nJika data yang dicari tidak ditemukan atau Google Sheets tidak memberikan hasil yang sesuai, jangan tampilkan pesan error teknis kepada pengguna.\n\nBerikan respons yang ramah dan natural, misalnya:\n\"Maaf, produk yang kamu cari belum tersedia di data makeup kami. Kamu bisa coba cari produk lain atau sebutkan jenis makeup dan budget yang kamu inginkan, nanti aku bantu carikan.\"\n\nJangan menyebutkan error, node, tool, Google Sheets, atau masalah teknis lainnya kepada pengguna."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "c8ead027-c87c-4984-94dd-4ce8b8ceaa99",
+      "name": "AI Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.8-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        288
+      ],
+      "id": "5f16b409-4d8e-4f99-b47d-99fe4af59e24",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Ehd5YTD0aUwAwYRc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        304
+      ],
+      "id": "b4d6f185-dd89-4d5b-b4ca-104d661a98d3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15vht3-T7-s91WCF3jGq_iI3FrEuWb3IV-VeJMcEZaAk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        128
+      ],
+      "id": "5d1ca538-8287-4aa3-87af-345bac0bde2e",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "azZLCtHWFG9rWcKp",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4ff33626-737c-447e-aea6-50020e2fbfdb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "KUPGh8gHlrExy0Rk",
+  "tags": []
+}
