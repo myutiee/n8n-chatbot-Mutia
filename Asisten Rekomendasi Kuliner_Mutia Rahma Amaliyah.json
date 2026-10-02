@@ -1,0 +1,117 @@
+{
+  "name": "Asisten Rekomendasi Kuliner_Mutia Rahma Amaliyah",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! 👋 Saya Utie Asisten Rekomendasi Kuliner. Saya siap membantu kamu mencari rekomendasi makanan dan minuman. Kamu lagi ingin makan apa?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "94fad579-9b8e-4e46-aae5-a39e604bdcd3",
+      "name": "When chat message received",
+      "webhookId": "ca740f04-25e4-4997-90da-f71a3e1bbfb9"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah Asisten Rekomendasi Kuliner.\n\nTugas kamu adalah membantu pengguna memilih makanan dan minuman berdasarkan selera, jenis makanan, budget, waktu makan, dan suasana.\n\nGunakan bahasa Indonesia yang santai, ramah, dan mudah dipahami.\n\nAturan jawaban:\n- Jawab secara singkat dan langsung.\n- Berikan maksimal 3 rekomendasi.\n- Setiap rekomendasi cukup diberi nama dan alasan singkat.\n- Jangan membuat jawaban terlalu panjang.\n- Jika informasi belum cukup, tanyakan satu hal yang paling penting.\n- Ingat konteks percakapan sebelumnya jika masih berkaitan.\n- Jangan mengarang harga, alamat, jam buka, atau informasi tempat makan yang tidak diberikan pengguna.\n- Jika pengguna meminta rekomendasi, langsung berikan rekomendasi.\n- Jika pertanyaan tidak berkaitan dengan kuliner, jelaskan bahwa kamu fokus membantu rekomendasi makanan dan minuman."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f0683f44-d3e0-48d6-9293-ad10123067d5",
+      "name": "AI Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "a1c4dadc-27dc-48e6-b032-26f48f32b717",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Ehd5YTD0aUwAwYRc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "a592bda2-133c-48b5-8cda-4e907caaddd7",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "89173184-a1d2-4305-92fa-1efd478c98e9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "gut4tu35WSd0AmzK",
+  "tags": []
+}
