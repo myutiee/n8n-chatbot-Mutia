@@ -1,0 +1,303 @@
+{
+  "name": "Pembuatan Agen AI Chatbot Web dengan Data di Supabase Vector Store dari File PDF",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1sVT2iY4Tz-xeo8vi0xUTJmg2wg3VduB5",
+          "mode": "list",
+          "cachedResultName": "Contoh_dokumen_basis_pengertahuan_RAG_berisi_panduan_menulis_bab.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1sVT2iY4Tz-xeo8vi0xUTJmg2wg3VduB5/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        432,
+        -288
+      ],
+      "id": "c5f7744e-827b-4d8c-9754-e43a18c8ce26",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ARyZ002GsDzdiOZN",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -288
+      ],
+      "id": "ab965d67-e872-4eec-b6f7-f08470f8f77e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        -288
+      ],
+      "id": "51fea1f6-1573-40ad-97de-63e29bbd572c",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "D1yJVIPAm1Kvksis",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        32
+      ],
+      "id": "858eb513-b418-4d41-b24c-bb6323f055fe",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        768,
+        16
+      ],
+      "id": "4826007f-6c8d-4dcc-8e25-e10e99bbf811",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Ehd5YTD0aUwAwYRc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! Saya asisten yang menjawab pertanyaan seputar panduan menulis bab laporan penelitian berdasarkan dokumen yang tersedia. Silakan bertanya!",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -96,
+        -16
+      ],
+      "id": "a5d6b478-46d1-45f4-a094-ddfc0e03336a",
+      "name": "When chat message received",
+      "webhookId": "976954f5-3a71-4367-815f-13896fc7f709"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten chatbot yang menjawab pertanyaan berdasarkan dokumen basis pengetahuan RAG berisi panduan menulis bab laporan penelitian, khususnya Bab I Pendahuluan (latar belakang, rumusan masalah, tujuan penelitian, manfaat penelitian, batasan masalah, dan sistematika penulisan).\n\nAturan menjawab:\n1. Selalu gunakan tool Supabase Vector Store untuk mencari informasi di dokumen sebelum menjawab.\n2. Jawab dalam bahasa Indonesia yang jelas, ringkas, dan hanya berdasarkan isi dokumen.\n3. Jika diminta contoh, ambil contoh dari dokumen.\n4. Jika jawabannya tidak ada di dokumen, katakan \"Maaf, saya tidak menemukan informasi tersebut di dokumen.\" Jangan mengarang jawaban."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        96,
+        -32
+      ],
+      "id": "3c710e29-3c1b-47dd-890d-92cb3a4ae67c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        112
+      ],
+      "id": "b54074f1-5409-4735-b9ce-f3f279f2a510",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Ehd5YTD0aUwAwYRc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        192,
+        112
+      ],
+      "id": "140fbff5-25cb-4451-98bb-756029a0c522",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "bOxcBjTzZKzUBzKQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Gunakan tool ini untuk mencari informasi dari dokumen panduan menulis bab laporan penelitian (Bab I Pendahuluan).",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        112
+      ],
+      "id": "a53067ff-e452-4aef-a15b-d5e7982984bd",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "D1yJVIPAm1Kvksis",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "80ee0081-f725-4bbb-89bd-8530aaff0255",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "gut4tu35WSd0AmzK",
+  "tags": []
+}
